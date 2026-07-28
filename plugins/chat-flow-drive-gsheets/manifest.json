@@ -1,0 +1,187 @@
+{
+  "id": "chat-flow-drive-gsheets",
+  "name": "Chat Flow with Drive & Sheets",
+  "version": "1.3.0",
+  "type": "extension",
+  "main": "dist/index.js",
+  "description": "Interactive flow menu chatbot with Google Drive and uploaded file attachments (images, documents, audio, video), a global return-to-main-menu option, and automatic option selection logging to Google Sheets.",
+  "author": "Antigravity Assistant",
+  "license": "MIT",
+  "keywords": [
+    "chat-flow",
+    "google-drive",
+    "google-sheets",
+    "menu",
+    "flow",
+    "auto-reply",
+    "whatsapp",
+    "openwa"
+  ],
+  "status": "stable",
+  "minOpenWAVersion": "0.7.0",
+  "testedOpenWAVersion": "0.8.1",
+  "provides": [
+    "auto-reply",
+    "message-logging"
+  ],
+  "permissions": [
+    "messages:send",
+    "conversation:send",
+    "net:fetch"
+  ],
+  "net": {
+    "allow": [
+      "oauth2.googleapis.com",
+      "sheets.googleapis.com"
+    ]
+  },
+  "sessionScoped": true,
+  "sessions": [
+    "*"
+  ],
+  "hooks": [
+    "message:received"
+  ],
+  "configUi": {
+    "entry": "config/index.html",
+    "height": 820
+  },
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "trigger": {
+        "type": "string",
+        "title": "Trigger word",
+        "description": "The word that starts the flow (case-insensitive). Leave empty to start on any message."
+      },
+      "greeting": {
+        "type": "textarea",
+        "required": true,
+        "title": "Greeting + menu",
+        "description": "Sent when the flow starts. Include your main menu options here."
+      },
+      "respondInGroups": {
+        "type": "boolean",
+        "default": false,
+        "title": "Also respond in group chats"
+      },
+      "serviceAccountJson": {
+        "type": "string",
+        "secret": true,
+        "title": "Google Service Account JSON",
+        "description": "JSON key for Google Service Account. Share your Google Sheet with client_email as Editor."
+      },
+      "spreadsheetId": {
+        "type": "string",
+        "title": "Google Spreadsheet ID",
+        "description": "Spreadsheet ID from URL: /spreadsheets/d/<ID>/edit"
+      },
+      "sheetTab": {
+        "type": "string",
+        "default": "Logs",
+        "title": "Sheet tab name"
+      },
+      "trackingLookupEnabled": {
+        "type": "boolean",
+        "default": true,
+        "title": "Enable tracking lookup"
+      },
+      "trackingSpreadsheetId": {
+        "type": "string",
+        "default": "1jvOCb1yWgbGWT6SQ1aMA6tx8hT4w5qPiOhCs6P6bzuQ",
+        "title": "Tracking spreadsheet ID"
+      },
+      "trackingSheetTab": {
+        "type": "string",
+        "default": "Servicios",
+        "title": "Tracking sheet tab"
+      },
+      "trackingMenuPaths": {
+        "type": "string",
+        "default": "1 > 2, 2 > 2",
+        "title": "Menu path(s) that start tracking lookup"
+      },
+      "options": {
+        "type": "array",
+        "title": "Menu options tree",
+        "description": "Menu tree options. Reply text is optional; attach an image, document, audio, video, or other file and/or sub-options when needed.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "title": "Key (e.g. 1)"
+            },
+            "text": {
+              "type": "textarea",
+              "title": "Reply text"
+            },
+            "fileData": {
+              "type": "string",
+              "secret": true,
+              "title": "Archivo adjunto",
+              "description": "Archivo cargado desde el editor. Las imágenes, audios y videos se envían en su formato nativo; los demás archivos se envían como documento de WhatsApp."
+            },
+            "fileName": {
+              "type": "string",
+              "title": "Nombre del archivo"
+            },
+            "options": {
+              "type": "array",
+              "title": "Sub-options"
+            }
+          }
+        }
+      }
+    }
+  },
+  "i18n": {
+    "es": {
+      "name": "Flujo de Chat con Drive y Sheets",
+      "description": "Auto-respuesta interactiva tipo menú con envío de imágenes y archivos de Google Drive o cargados en el editor, opción para volver al menú principal y registro automático de selecciones en Google Sheets.",
+      "config": {
+        "trigger": {
+          "title": "Palabra clave activadora",
+          "description": "Palabra que inicia el flujo (ej: 'hola', 'menu'). Déjalo vacío para iniciar con cualquier mensaje."
+        },
+        "greeting": {
+          "title": "Saludo inicial + Menú",
+          "description": "Mensaje enviado al iniciar el flujo con las opciones principales."
+        },
+        "respondInGroups": {
+          "title": "Responder también en grupos"
+        },
+        "serviceAccountJson": {
+          "title": "JSON de Cuenta de Servicio Google",
+          "description": "Clave JSON de la cuenta de servicio de Google Cloud. Comparte la hoja de cálculo con el email de esta cuenta como Editor."
+        },
+        "spreadsheetId": {
+          "title": "ID de la Hoja de Cálculo Google",
+          "description": "El ID obtenido de la URL de Google Sheets: /spreadsheets/d/<ID>/edit"
+        },
+        "sheetTab": {
+          "title": "Nombre de la pestaña",
+          "description": "Nombre de la pestaña/hoja donde se registrarán las respuestas (ej: Registros o Logs)."
+        },
+        "trackingLookupEnabled": {
+          "title": "Habilitar consulta de seguimiento"
+        },
+        "trackingSpreadsheetId": {
+          "title": "ID de hoja para seguimiento",
+          "description": "ID de AVALUOS Y MANIFESTACIONES v2.0 2026."
+        },
+        "trackingSheetTab": {
+          "title": "Pestaña para seguimiento",
+          "description": "Pestaña con las columnas de número de orden, CLAVE_ID, situación actual y solución."
+        },
+        "trackingMenuPaths": {
+          "title": "Rutas de menú que consultan seguimiento",
+          "description": "Ejemplo: 1 > 2. Separa varias rutas con coma, por ejemplo: 1 > 2, 2 > 2."
+        },
+        "options": {
+          "title": "Árbol de opciones del menú"
+        }
+      }
+    }
+  }
+}

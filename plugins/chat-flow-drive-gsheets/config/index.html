@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flujo de Chat con Drive y Sheets - Configuración</title>
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --fg: #212529;
+    --fg-strong: #1a1a2e;
+    --muted: #6c757d;
+    --hint: #868e96;
+    --surface: #ffffff;
+    --border: #dee2e6;
+    --border-input: #ced4da;
+    --border-soft: #e9ecef;
+    --accent: #4f7fff;
+    --accent-strong: #3360cc;
+    --accent-ring: rgba(79,127,255,0.15);
+    --add-bg: #e8f0fe; --add-fg: #2d5fc4; --add-bd: #b8d0f7; --add-bg-hover: #d0e3ff;
+    --rm-bg: #fdecea; --rm-fg: #b91c1c; --rm-bd: #f5c6c6; --rm-bg-hover: #fcd5d5;
+    --ok-bg: #d4edda; --ok-fg: #155724; --ok-bd: #c3e6cb;
+    --err-bg: #f8d7da; --err-fg: #721c24; --err-bd: #f5c6c6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12161c;
+      --fg: #e6e9ef;
+      --fg-strong: #f2f4f8;
+      --muted: #9aa4b2;
+      --hint: #8b95a3;
+      --surface: #1a1f27;
+      --border: #2b323c;
+      --border-input: #39414d;
+      --border-soft: #262d36;
+      --accent: #6b93ff;
+      --accent-strong: #4f7fff;
+      --accent-ring: rgba(107,147,255,0.25);
+      --add-bg: #1b2740; --add-fg: #9dbcff; --add-bd: #2d4372; --add-bg-hover: #24345a;
+      --rm-bg: #3a1f20; --rm-fg: #ff9a94; --rm-bd: #5c2f2f; --rm-bg-hover: #4a2728;
+      --ok-bg: #16301f; --ok-fg: #7fd39b; --ok-bd: #27543a;
+      --err-bg: #3a1f20; --err-fg: #ff9a94; --err-bd: #5c2f2f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12161c;
+    --fg: #e6e9ef;
+    --fg-strong: #f2f4f8;
+    --muted: #9aa4b2;
+    --hint: #8b95a3;
+    --surface: #1a1f27;
+    --border: #2b323c;
+    --border-input: #39414d;
+    --border-soft: #262d36;
+    --accent: #6b93ff;
+    --accent-strong: #4f7fff;
+    --accent-ring: rgba(107,147,255,0.25);
+    --add-bg: #1b2740; --add-fg: #9dbcff; --add-bd: #2d4372; --add-bg-hover: #24345a;
+    --rm-bg: #3a1f20; --rm-fg: #ff9a94; --rm-bd: #5c2f2f; --rm-bg-hover: #4a2728;
+    --ok-bg: #16301f; --ok-fg: #7fd39b; --ok-bd: #27543a;
+    --err-bg: #3a1f20; --err-fg: #ff9a94; --err-bd: #5c2f2f;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: var(--bg);
+    color: var(--fg);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  h2 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 16px;
+    color: var(--fg-strong);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-group:last-child {
+    margin-bottom: 0;
+  }
+
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--fg);
+  }
+
+  .hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  input[type="text"], textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 12px;
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--fg);
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  input[type="text"]:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-ring);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 70px;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: normal;
+  }
+  .checkbox-label input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+
+  /* Tree node builder */
+  .node-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .node-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+    padding: 12px;
+    position: relative;
+  }
+
+  .node-header {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .node-key {
+    width: 90px;
+    flex-shrink: 0;
+  }
+
+  .node-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .file-status {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .node-children {
+    margin-top: 12px;
+    padding-left: 20px;
+    border-left: 2px dashed var(--border);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #ffffff;
+  }
+  .btn-primary:hover {
+    background: var(--accent-strong);
+  }
+
+  .btn-add {
+    background: var(--add-bg);
+    color: var(--add-fg);
+    border-color: var(--add-bd);
+  }
+  .btn-add:hover {
+    background: var(--add-bg-hover);
+  }
+
+  .btn-danger {
+    background: var(--rm-bg);
+    color: var(--rm-fg);
+    border-color: var(--rm-bd);
+    padding: 4px 8px;
+  }
+  .btn-danger:hover {
+    background: var(--rm-bg-hover);
+  }
+
+  .actions-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .feedback {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    display: none;
+  }
+  .feedback.success {
+    display: block;
+    background: var(--ok-bg);
+    color: var(--ok-fg);
+    border: 1px solid var(--ok-bd);
+  }
+  .feedback.error {
+    display: block;
+    background: var(--err-bg);
+    color: var(--err-fg);
+    border: 1px solid var(--err-bd);
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>⚙️ Configuración del Flujo</h2>
+  
+  <div class="form-group">
+    <label for="trigger">Palabra clave activadora (Trigger)</label>
+    <input type="text" id="trigger" placeholder="ej: menu, hola, ayuda (Déjalo vacío para responder a cualquier mensaje)" />
+    <div class="hint">Si se configura, el bot iniciará el menú cuando el usuario escriba esta palabra.</div>
+  </div>
+
+  <div class="form-group">
+    <label for="greeting">Saludo Inicial y Menú Principal *</label>
+    <textarea id="greeting" rows="4" placeholder="¡Hola! Bienvenido a nuestro servicio. Por favor elige una opción:&#10;1. Ver catálogo de productos&#10;2. Descargar guía en PDF&#10;3. Hablar con soporte"></textarea>
+    <div class="hint">Mensaje de bienvenida con las opciones numeradas que recibirá el usuario.</div>
+  </div>
+
+  <div class="form-group">
+    <label class="checkbox-label">
+      <input type="checkbox" id="respondInGroups" />
+      Responder también en chats de grupos
+    </label>
+  </div>
+</div>
+
+<div class="card">
+  <h2>📊 Integración con Google Sheets</h2>
+  <div class="hint" style="margin-bottom: 12px;">Todos los clics y selecciones del menú se registrarán automáticamente en tu hoja de cálculo.</div>
+
+  <div class="form-group">
+    <label for="spreadsheetId">ID de la Hoja de Cálculo (Google Spreadsheet ID)</label>
+    <input type="text" id="spreadsheetId" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms" />
+    <div class="hint">Obtén este ID desde la URL de tu hoja de Google: https://docs.google.com/spreadsheets/d/<b>ID_AQUÍ</b>/edit</div>
+  </div>
+
+  <div class="form-group">
+    <label for="sheetTab">Nombre de la Pestaña / Hoja</label>
+    <input type="text" id="sheetTab" placeholder="Logs" value="Logs" />
+  </div>
+
+  <div class="form-group">
+    <label for="serviceAccountJson">JSON de Cuenta de Servicio Google (Service Account JSON)</label>
+    <textarea id="serviceAccountJson" rows="3" placeholder='{"type": "service_account", "project_id": "...", "client_email": "...@app.iam.gserviceaccount.com", "private_key": "-----BEGIN PRIVATE KEY-----\n..."}'></textarea>
+    <div class="hint">⚠️ Importante: Comparte tu Hoja de Google Sheets con el <b>client_email</b> de la cuenta de servicio dándole permisos de Editor.</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>🔎 Consulta de Seguimiento</h2>
+  <div class="hint" style="margin-bottom: 12px;">Cuando se seleccione una ruta configurada, el bot solicitará el número de orden y la clave catastral, y responderá con la situación actual y la solución.</div>
+
+  <div class="form-group">
+    <label class="checkbox-label">
+      <input type="checkbox" id="trackingLookupEnabled" checked />
+      Habilitar consulta de seguimiento
+    </label>
+  </div>
+
+  <div class="form-group">
+    <label for="trackingSpreadsheetId">ID de hoja de cálculo para seguimiento</label>
+    <input type="text" id="trackingSpreadsheetId" value="1jvOCb1yWgbGWT6SQ1aMA6tx8hT4w5qPiOhCs6P6bzuQ" />
+  </div>
+
+  <div class="form-group">
+    <label for="trackingSheetTab">Pestaña de seguimiento</label>
+    <input type="text" id="trackingSheetTab" value="Servicios" />
+  </div>
+
+  <div class="form-group">
+    <label for="trackingMenuPaths">Ruta(s) que activan la consulta</label>
+    <input type="text" id="trackingMenuPaths" value="1 > 2, 2 > 2" placeholder="1 > 2, 2 > 2" />
+    <div class="hint">Usa la secuencia de opciones separada por <b>&gt;</b>. Para varias rutas, sepáralas por coma.</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>🌳 Opciones del Menú (Árbol de Respuestas y Archivos Drive)</h2>
+  <div class="hint" style="margin-bottom: 12px;">Configura las respuestas para cada número u opción. Carga imágenes, documentos, audio, video u otros archivos para enviarlos directamente por WhatsApp. En cualquier submenú, la persona puede responder <b>0</b> para volver al menú principal.</div>
+
+  <div id="tree" class="node-list"></div>
+
+  <div style="margin-top: 12px;">
+    <button type="button" class="btn btn-add" id="addRoot">+ Agregar opción principal</button>
+  </div>
+</div>
+
+<div class="actions-bar">
+  <div id="feedback" class="feedback"></div>
+  <button type="button" class="btn btn-primary" id="saveBtn" style="padding: 8px 20px; font-size: 14px;">💾 Guardar Configuración</button>
+</div>
+
+<script>
+(function() {
+  var saveBtn = document.getElementById('saveBtn');
+  var feedbackEl = document.getElementById('feedback');
+
+  function showFeedback(msg, isSuccess) {
+    feedbackEl.textContent = msg;
+    feedbackEl.className = 'feedback ' + (isSuccess ? 'success' : 'error');
+  }
+
+  function hideFeedback() {
+    feedbackEl.className = 'feedback';
+  }
+
+  function applyTheme(theme) {
+    if (theme === 'light' || theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+  }
+
+  function renderNode(data) {
+    data = data || {};
+    var item = document.createElement('div');
+    item.className = 'node-item';
+
+    var header = document.createElement('div');
+    header.className = 'node-header';
+
+    var keyInput = document.createElement('input');
+    keyInput.type = 'text';
+    keyInput.className = 'node-key';
+    keyInput.placeholder = 'Clave (ej: 1)';
+    keyInput.value = data.key || '';
+
+    var body = document.createElement('div');
+    body.className = 'node-body';
+
+    var textInput = document.createElement('textarea');
+    textInput.rows = 2;
+    textInput.placeholder = 'Texto de respuesta cuando se selecciona esta opción...';
+    textInput.value = data.text || '';
+
+    var fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    // Leave accept unrestricted so operators can attach images, documents, audio,
+    // video, and other WhatsApp-compatible files. The runtime uses the data URL MIME
+    // type to choose the native WhatsApp message type.
+    fileInput.accept = '*/*';
+    var fileStatus = document.createElement('div');
+    fileStatus.className = 'file-status';
+    // Existing attachments are secret-redacted by the host. Preserve the sentinel on a save so the
+    // backend keeps the stored file without exposing its contents to the configuration iframe.
+    item._fileData = data.fileData || '';
+    item._fileName = data.fileName || '';
+    // Keep legacy Drive links intact when an existing flow is opened and saved, even though the
+    // editor now guides new configurations toward direct file uploads.
+    item._fileUrl = data.fileUrl || '';
+    fileStatus.textContent = item._fileName ? 'Archivo cargado: ' + item._fileName : 'Sin archivo adjunto';
+    fileInput.onchange = function() {
+      var file = fileInput.files && fileInput.files[0];
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) {
+        showFeedback('El archivo no puede superar 10 MB.', false);
+        fileInput.value = '';
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function() {
+        item._fileData = String(reader.result || '');
+        item._fileName = file.name;
+        fileStatus.textContent = 'Archivo cargado: ' + file.name;
+        hideFeedback();
+      };
+      reader.onerror = function() {
+        showFeedback('No se pudo leer el archivo.', false);
+        fileInput.value = '';
+      };
+      reader.readAsDataURL(file);
+    };
+
+    body.appendChild(textInput);
+    body.appendChild(fileInput);
+    body.appendChild(fileStatus);
+
+    var removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'btn btn-danger';
+    removeBtn.textContent = '🗑️ Eliminar';
+    removeBtn.onclick = function() {
+      item.parentNode.removeChild(item);
+    };
+
+    header.appendChild(keyInput);
+    header.appendChild(body);
+    header.appendChild(removeBtn);
+    item.appendChild(header);
+
+    var childrenContainer = document.createElement('div');
+    childrenContainer.className = 'node-children node-list';
+
+    if (Array.isArray(data.options)) {
+      data.options.forEach(function(childData) {
+        childrenContainer.appendChild(renderNode(childData));
+      });
+    }
+
+    var addSubBtn = document.createElement('button');
+    addSubBtn.type = 'button';
+    addSubBtn.className = 'btn btn-add';
+    addSubBtn.style.marginTop = '8px';
+    addSubBtn.textContent = '+ Agregar sub-opción';
+    addSubBtn.onclick = function() {
+      childrenContainer.appendChild(renderNode({}));
+    };
+
+    item.appendChild(childrenContainer);
+    item.appendChild(addSubBtn);
+
+    return item;
+  }
+
+  function collectNodes(container) {
+    var nodes = [];
+    var items = container.querySelectorAll(':scope > .node-item');
+    items.forEach(function(item) {
+      var keyInput = item.querySelector(':scope > .node-header .node-key');
+      var textInput = item.querySelector(':scope > .node-header .node-body textarea');
+      var childrenContainer = item.querySelector(':scope > .node-children');
+
+      var key = (keyInput ? keyInput.value : '').trim();
+      if (!key) return;
+
+      var node = {
+        key: key,
+        text: textInput ? textInput.value : '',
+        fileData: item._fileData || '',
+        fileName: item._fileName || '',
+        fileUrl: item._fileUrl || ''
+      };
+
+      var subOptions = collectNodes(childrenContainer);
+      if (subOptions.length > 0) {
+        node.options = subOptions;
+      }
+
+      nodes.push(node);
+    });
+    return nodes;
+  }
+
+  function populateConfig(cfg) {
+    cfg = cfg || {};
+    document.getElementById('trigger').value = cfg.trigger || '';
+    document.getElementById('greeting').value = cfg.greeting || '';
+    document.getElementById('respondInGroups').checked = !!cfg.respondInGroups;
+    document.getElementById('spreadsheetId').value = cfg.spreadsheetId || '';
+    document.getElementById('sheetTab').value = cfg.sheetTab || 'Logs';
+    document.getElementById('serviceAccountJson').value = cfg.serviceAccountJson || '';
+    document.getElementById('trackingLookupEnabled').checked = cfg.trackingLookupEnabled !== false;
+    document.getElementById('trackingSpreadsheetId').value = cfg.trackingSpreadsheetId || '1jvOCb1yWgbGWT6SQ1aMA6tx8hT4w5qPiOhCs6P6bzuQ';
+    document.getElementById('trackingSheetTab').value = cfg.trackingSheetTab || 'Servicios';
+    document.getElementById('trackingMenuPaths').value = cfg.trackingMenuPaths || '1 > 2, 2 > 2';
+
+    var treeEl = document.getElementById('tree');
+    treeEl.innerHTML = '';
+
+    if (Array.isArray(cfg.options)) {
+      cfg.options.forEach(function(optData) {
+        treeEl.appendChild(renderNode(optData));
+      });
+    }
+  }
+
+  function assembleConfig() {
+    return {
+      trigger: document.getElementById('trigger').value.trim(),
+      greeting: document.getElementById('greeting').value.trim(),
+      respondInGroups: document.getElementById('respondInGroups').checked,
+      spreadsheetId: document.getElementById('spreadsheetId').value.trim(),
+      sheetTab: document.getElementById('sheetTab').value.trim() || 'Logs',
+      serviceAccountJson: document.getElementById('serviceAccountJson').value.trim(),
+      trackingLookupEnabled: document.getElementById('trackingLookupEnabled').checked,
+      trackingSpreadsheetId: document.getElementById('trackingSpreadsheetId').value.trim(),
+      trackingSheetTab: document.getElementById('trackingSheetTab').value.trim() || 'Servicios',
+      trackingMenuPaths: document.getElementById('trackingMenuPaths').value.trim() || '1 > 2, 2 > 2',
+      options: collectNodes(document.getElementById('tree'))
+    };
+  }
+
+  function validateConfig(cfg) {
+    if (!cfg.greeting) return 'El saludo inicial es obligatorio.';
+    if (!cfg.options.length) return 'Agrega al menos una opción al menú.';
+    if ((cfg.spreadsheetId && !cfg.serviceAccountJson) || (!cfg.spreadsheetId && cfg.serviceAccountJson)) {
+      return 'Para registrar en Google Sheets debes indicar tanto el ID de la hoja como el JSON de la cuenta de servicio.';
+    }
+    return '';
+  }
+
+  window.addEventListener('message', function(event) {
+    var data = event.data;
+    if (!data || typeof data.type !== 'string') return;
+    if (data.type === 'config:value') {
+      applyTheme(data.theme);
+      populateConfig(data.config);
+    } else if (data.type === 'config:saved') {
+      showFeedback('¡Configuración guardada exitosamente!', true);
+      saveBtn.disabled = false;
+    } else if (data.type === 'config:error') {
+      showFeedback(data.message || 'Error al guardar la configuración.', false);
+      saveBtn.disabled = false;
+    }
+  });
+
+  saveBtn.addEventListener('click', function() {
+    saveBtn.disabled = true;
+    hideFeedback();
+    var cfg = assembleConfig();
+    var validationError = validateConfig(cfg);
+    if (validationError) {
+      showFeedback(validationError, false);
+      saveBtn.disabled = false;
+      return;
+    }
+    parent.postMessage({ type: 'config:save', config: cfg }, '*');
+  });
+
+  document.getElementById('addRoot').addEventListener('click', function() {
+    document.getElementById('tree').appendChild(renderNode({}));
+  });
+
+  // Request initial config
+  parent.postMessage({ type: 'config:get' }, '*');
+})();
+</script>
+</body>
+</html>
