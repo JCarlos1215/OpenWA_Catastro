@@ -311,7 +311,7 @@
 
 <div class="card">
   <h2>🔎 Consulta de Seguimiento</h2>
-  <div class="hint" style="margin-bottom: 12px;">Cuando se seleccione una ruta configurada, el bot solicitará el número de orden y la clave catastral, y responderá con la situación actual y la solución.</div>
+  <div class="hint" style="margin-bottom: 12px;">Al elegir la opción 2 de cualquier submenú, el bot valida el No. Orden y después solicita la Clave Catastral sin guiones. También valida el Movimiento correspondiente al seguimiento y responde con Situación Actual y Estatus.</div>
 
   <div class="form-group">
     <label class="checkbox-label">
@@ -322,18 +322,18 @@
 
   <div class="form-group">
     <label for="trackingSpreadsheetId">ID de hoja de cálculo para seguimiento</label>
-    <input type="text" id="trackingSpreadsheetId" value="1jvOCb1yWgbGWT6SQ1aMA6tx8hT4w5qPiOhCs6P6bzuQ" />
+    <input type="text" id="trackingSpreadsheetId" value="1Cn1C_GoON1640ne-W2rE3opt5pnO4rido3wlVU7dK0k" />
   </div>
 
   <div class="form-group">
     <label for="trackingSheetTab">Pestaña de seguimiento</label>
-    <input type="text" id="trackingSheetTab" value="Servicios" />
+    <input type="text" id="trackingSheetTab" value="Hoja 1" />
   </div>
 
   <div class="form-group">
     <label for="trackingMenuPaths">Ruta(s) que activan la consulta</label>
-    <input type="text" id="trackingMenuPaths" value="1 > 2, 2 > 2" placeholder="1 > 2, 2 > 2" />
-    <div class="hint">Usa la secuencia de opciones separada por <b>&gt;</b>. Para varias rutas, sepáralas por coma.</div>
+    <input type="text" id="trackingMenuPaths" value="* > 2" placeholder="* > 2, 1 > 3" />
+    <div class="hint"><b>* &gt; 2</b> activa la consulta al elegir la opción 2 de cualquier submenú. También puedes agregar rutas exactas separadas por coma.</div>
   </div>
 </div>
 
@@ -512,9 +512,9 @@
     document.getElementById('sheetTab').value = cfg.sheetTab || 'Logs';
     document.getElementById('serviceAccountJson').value = cfg.serviceAccountJson || '';
     document.getElementById('trackingLookupEnabled').checked = cfg.trackingLookupEnabled !== false;
-    document.getElementById('trackingSpreadsheetId').value = cfg.trackingSpreadsheetId || '1jvOCb1yWgbGWT6SQ1aMA6tx8hT4w5qPiOhCs6P6bzuQ';
-    document.getElementById('trackingSheetTab').value = cfg.trackingSheetTab || 'Servicios';
-    document.getElementById('trackingMenuPaths').value = cfg.trackingMenuPaths || '1 > 2, 2 > 2';
+    document.getElementById('trackingSpreadsheetId').value = cfg.trackingSpreadsheetId || '1Cn1C_GoON1640ne-W2rE3opt5pnO4rido3wlVU7dK0k';
+    document.getElementById('trackingSheetTab').value = cfg.trackingSheetTab || 'Hoja 1';
+    document.getElementById('trackingMenuPaths').value = cfg.trackingMenuPaths || '* > 2';
 
     var treeEl = document.getElementById('tree');
     treeEl.innerHTML = '';
@@ -536,8 +536,8 @@
       serviceAccountJson: document.getElementById('serviceAccountJson').value.trim(),
       trackingLookupEnabled: document.getElementById('trackingLookupEnabled').checked,
       trackingSpreadsheetId: document.getElementById('trackingSpreadsheetId').value.trim(),
-      trackingSheetTab: document.getElementById('trackingSheetTab').value.trim() || 'Servicios',
-      trackingMenuPaths: document.getElementById('trackingMenuPaths').value.trim() || '1 > 2, 2 > 2',
+      trackingSheetTab: document.getElementById('trackingSheetTab').value.trim() || 'servicios',
+      trackingMenuPaths: document.getElementById('trackingMenuPaths').value.trim() || '* > 2',
       options: collectNodes(document.getElementById('tree'))
     };
   }

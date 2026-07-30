@@ -88,17 +88,17 @@
       },
       "trackingSpreadsheetId": {
         "type": "string",
-        "default": "1jvOCb1yWgbGWT6SQ1aMA6tx8hT4w5qPiOhCs6P6bzuQ",
+        "default": "1Cn1C_GoON1640ne-W2rE3opt5pnO4rido3wlVU7dK0k",
         "title": "Tracking spreadsheet ID"
       },
       "trackingSheetTab": {
         "type": "string",
-        "default": "Servicios",
+        "default": "Hoja 1",
         "title": "Tracking sheet tab"
       },
       "trackingMenuPaths": {
         "type": "string",
-        "default": "1 > 2, 2 > 2",
+        "default": "* > 2",
         "title": "Menu path(s) that start tracking lookup"
       },
       "options": {
@@ -168,15 +168,15 @@
         },
         "trackingSpreadsheetId": {
           "title": "ID de hoja para seguimiento",
-          "description": "ID de AVALUOS Y MANIFESTACIONES v2.0 2026."
+          "description": "ID de la hoja todos_los_servicios."
         },
         "trackingSheetTab": {
           "title": "Pestaña para seguimiento",
-          "description": "Pestaña con las columnas de número de orden, CLAVE_ID, situación actual y solución."
+          "description": "Pestaña con las columnas No. Orden, Clave Catastral, Situación Actual y Estatus."
         },
         "trackingMenuPaths": {
           "title": "Rutas de menú que consultan seguimiento",
-          "description": "Ejemplo: 1 > 2. Separa varias rutas con coma, por ejemplo: 1 > 2, 2 > 2."
+          "description": "Por defecto, * > 2 activa la consulta al elegir la opción 2 desde cualquier submenú. Separa rutas exactas adicionales con coma, por ejemplo: 1 > 3, 2 > 4."
         },
         "options": {
           "title": "Árbol de opciones del menú"

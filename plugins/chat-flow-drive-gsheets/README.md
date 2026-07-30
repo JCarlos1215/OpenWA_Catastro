@@ -40,9 +40,9 @@ Al estar dentro de un submenú, el plugin agrega la opción `0. Volver al menú 
 
 ## Consulta de seguimiento
 
-Las rutas `1 > 2` y `2 > 2` activan por defecto la consulta de seguimiento. El bot solicita el `NÚMERO DE ORDEN` y después la `CLAVE CATASTRAL sin guiones`, busca una coincidencia exacta en la pestaña `Servicios` de `AVALUOS Y MANIFESTACIONES v2.0 2026` y responde con `SITUACIÓN ACTUAL` y `SOLUCIÓN`. Para comparar, ignora guiones, espacios y mayúsculas/minúsculas; internamente la clave se consulta en la columna `4.- CLAVE_ID`.
+Por defecto, al elegir la opción `2` desde cualquier submenú se activa la consulta de seguimiento. El bot valida primero el `No. Orden`, solicita después la `Clave Catastral sin guiones` y busca una coincidencia conjunta en la pestaña `servicios` de `todos_los_servicios`. Según el texto del seguimiento elegido también valida la columna `Movimiento` (por ejemplo, `TRANSMISION`, `AVALUO CATASTRAL`, `MANIFESTACION OFICIAL` o `ASIGNACION DE CLAVES`) antes de responder primero con `Situación Actual` y enseguida con `Estatus`. La clave con guiones se rechaza y se solicita nuevamente. Para comparar, se ignoran espacios, mayúsculas/minúsculas y otros separadores de los valores almacenados.
 
-Comparte esa hoja con el `client_email` de la cuenta de servicio configurada en el plugin, como mínimo con acceso de Lector. En la configuración puedes cambiar la ruta activadora o agregar varias, por ejemplo `1 > 2, 2 > 2`.
+Comparte esa hoja con el `client_email` de la cuenta de servicio configurada en el plugin, como mínimo con acceso de Lector. En la configuración, `* > 2` representa la opción `2` dentro de cualquier submenú; también puedes agregar rutas exactas adicionales, por ejemplo `1 > 3`.
 
 ## Consideraciones
 
